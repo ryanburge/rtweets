@@ -33,10 +33,10 @@ hh <- search_tweets(
 
 
 mc2 <- mc %>% select(status_id, created_at, user_id, screen_name, text, source, reply_to_status_id, reply_to_user_id, reply_to_screen_name, favorite_count, retweet_count)
-write.csv(mc2, "xmas_tweets.csv")
+write.csv(mc2, "xmas_tweets_1221.csv")
 
 hh2 <- hh %>% select(status_id, created_at, user_id, screen_name, text, source, reply_to_status_id, reply_to_user_id, reply_to_screen_name, favorite_count, retweet_count)
-write.csv(hh2, "hh_tweets.csv")
+write.csv(hh2, "hh_tweets_1221.csv")
 
 
 
@@ -126,4 +126,79 @@ ggsave(file="D://rtweets/merry_xmas/compare_v2.png", type = "cairo-png", width =
 
 
 
+a1 <- tidy_tweets_hh %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>% 
+  mutate(term = c("Happy Holidays"))
+
+
+a2 <- tidy_tweets_mc %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>% 
+  mutate(term = c("Merry Christmas"))
+
+
+sent <- bind_rows(a1, a2)
+
+p2 <- sent %>% 
+  # filter(hour >15) %>% 
+  ggplot(., aes(x=factor(term), y=sentiment, group = term, fill = term, label = term)) + geom_col(color = "black") + bar_rb() +
+  labs(x= "", y = "Sentiment Score", title = "Total Sentiment", subtitle = "Sentiment = Positive Words - Negative Words",caption = "Tweets Collected on 12/21/2017")
+
+
+hh_v2 <- read_csv("merry_xmas/hh_tweets.csv")
+mc_v2 <- read_csv("merry_xmas/xmas_tweets.csv")
+
+
+
+reg_words <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
+tidy_tweets_mc2 <- mc_v2 %>%
+  filter(!str_detect(text, "^RT")) %>%
+  mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https", "")) %>%
+  unnest_tokens(word, text, token = "regex", pattern = reg_words) %>%
+  filter(!word %in% stop_words$word,
+         str_detect(word, "[a-z]"))
+
+reg_words <- "([^A-Za-z_\\d#@']|'(?![A-Za-z_\\d#@]))"
+tidy_tweets_hh2 <- hh_v2 %>%
+  filter(!str_detect(text, "^RT")) %>%
+  mutate(text = str_replace_all(text, "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https", "")) %>%
+  unnest_tokens(word, text, token = "regex", pattern = reg_words) %>%
+  filter(!word %in% stop_words$word,
+         str_detect(word, "[a-z]"))
+
+
+
+
+a3 <- tidy_tweets_hh2 %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>% 
+  mutate(term = c("Happy Holidays"))
+
+
+a4 <- tidy_tweets_mc2 %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative) %>% 
+  mutate(term = c("Merry Christmas"))
+
+
+sent2 <- bind_rows(a3, a4)
+
+
+p1 <- sent2 %>% 
+  # filter(hour >15) %>% 
+  ggplot(., aes(x=factor(term), y=sentiment, group = term, fill = term, label = term)) + geom_col(color = "black") + bar_rb() +
+  labs(x= "", y = "Sentiment Score", title = "Total Sentiment", subtitle = "Sentiment = Positive Words - Negative Words", caption = "Tweets Collected on 12/20/2017")
+
+p1+p2
+
+ggsave(file="D://rtweets/merry_xmas/sent_patch.png", type = "cairo-png", width = 22, height = 15)
 
