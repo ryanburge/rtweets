@@ -33,10 +33,10 @@ hh <- search_tweets(
 
 
 mc2 <- mc %>% select(status_id, created_at, user_id, screen_name, text, source, reply_to_status_id, reply_to_user_id, reply_to_screen_name, favorite_count, retweet_count)
-write.csv(mc2, "xmas_tweets_1221.csv")
+write.csv(mc2, "xmas_tweets_1223.csv")
 
 hh2 <- hh %>% select(status_id, created_at, user_id, screen_name, text, source, reply_to_status_id, reply_to_user_id, reply_to_screen_name, favorite_count, retweet_count)
-write.csv(hh2, "hh_tweets_1221.csv")
+write.csv(hh2, "hh_tweets_1223.csv")
 
 
 
