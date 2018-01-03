@@ -102,19 +102,27 @@ c_graph <- bind_rows(hour_hh1, hour_mc1, hour_hh2, hour_mc2)
 
 g20 <- c_graph %>% 
    filter(day == "2017-12-20") %>% 
+  filter(hour == 20 | hour == 21) %>% 
   ggplot(., aes(x=factor(hour), y=n, group = term, fill = term, label = term)) + geom_col(position = "dodge", color = "black") + bar_rb() +
   labs(x= "Hour (GMT)", y = "Number of Tweets", title = "Volume of Tweets w/Merry Christmas vs. Happy Holidays", subtitle = "Twitter's API Limited Both Samples", caption = "Tweets Collected on 12/20/2017")
 
 
 g21 <- c_graph %>% 
   filter(day == "2017-12-21") %>% 
+  filter(hour == 19 ) %>% 
   ggplot(., aes(x=factor(hour), y=n, group = term, fill = term, label = term)) + geom_col(position = "dodge", color = "black") + bar_rb() +
   labs(x= "Hour (GMT)", y = "Number of Tweets", title = "", subtitle = "Twitter's API Limited Both Samples", caption = "Tweets Collected on 12/21/2017")
+
 
 g20 + g21
 
 ggsave(file="D://rtweets/merry_xmas/compare_rate.png", type = "cairo-png", width = 18, height = 15)
 
+hour_graph %>% 
+  ggplot(., aes(x=factor(date), y=n, group = term, fill = term, label = term)) + geom_col(position = "dodge", color = "black") + bar_rb() +
+  labs(x= "Hour (GMT)", y = "Number of Tweets", title = "Volume of Tweets w/Merry Christmas vs. Happy Holidays", subtitle = "Twitter's API Limited Both Samples")
+
+ggsave(file="D://rtweets/merry_xmas/simple_rate.png", type = "cairo-png", width = 18, height = 15)
 
 
 
@@ -165,7 +173,7 @@ cc %>%
   coord_flip() + 
   scale_y_continuous(labels = scales::percent) +
   flip_bar_rb() +
-  labs(x= "Word", y = "Percent of Tweets", title = "Are Merry Christmas Tweets More Political or Religious?", caption = "Tweets Collected on 12/20/2017") + 
+  labs(x= "Word", y = "Percent of Tweets", title = "Are Merry Christmas Tweets More Political or Religious?", caption = "Tweets Collected on 12/20-12/21") + 
   guides(fill = guide_legend(reverse=FALSE))
 
 ggsave(file="D://rtweets/merry_xmas/words_combined.png", type = "cairo-png", width = 18, height = 15)
