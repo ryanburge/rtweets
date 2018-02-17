@@ -11,4 +11,4 @@ secret <- "pSPc5YRrbcPyrZv9zGLoJvEY7lGtoiyaVw6AQh6z8P7hMw7gwr"
 twitter_token <- create_token(
   app = appname,
   consumer_key = key,
-  consumer_secret = secret)
+  consumer_secret = secret)   
