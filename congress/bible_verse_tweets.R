@@ -47,18 +47,32 @@ write.csv(write_bib, "bible_cong.csv")
 ## This is my cleaned tweets dataset, it's 1165 total tweets
 clean <- read_csv("clean_bible_cong.csv")
 
-count <- clean %>% group_by(screen_name) %>% count() %>% arrange(-n) %>% head(10)
+count <- clean %>% 
+  group_by(screen_name) %>% 
+  count() %>% 
+  arrange(-n) %>%
+  head(10)
 
 count$party <- c("Republican", "Republican", "Republican", "Republican", "Republican", "Republican", "Republican", "Republican", "Republican", "Republican")
+count$gender <- c("Male", "Male", "Male", "Male", "Female", "Male", "Male", "Male", "Male", "Male")
+
 
 count %>% 
-  ggplot(., aes(x= reorder(screen_name, n), y=n, fill = party, label = party, group= party)) + geom_col(fill = "firebrick3", color = "black") + 
-  coord_flip() + 
-  flip_bar_rb() +
-  geom_text(aes(y = n + 20, label = paste0(n)), position = position_dodge(width = .9), size = 10, family = "Product Sans") +
-  labs(x = "Screen Name", y = "Number of Tweets", title = "Which Members Tweet Bible Verses?", caption = "Scraped from Twitter's API (6/2008 - 4/2018)", subtitle = "The Top 10 Accounts Were All Republicans")
+  mutate(new = paste(party, gender, sep = " - ")) %>% 
+  ggplot(., aes(x= reorder(screen_name, n), y=n, fill = new, label = new, group= new)) + 
+  geom_col(color = "black") + 
+  coord_flip() +
+  scale_fill_manual(values = c("#ff9999", "#660000"))+
+  theme_minimal() +
+  theme(text=element_text(size=44, family="font")) +
+  theme(legend.position = c(0.65, 0.5)) +
+  theme(legend.title = element_blank()) +
+  geom_text(aes(y = n + 20, label = paste0(n)), position = position_dodge(width = .9), size = 10, family = "font") +
+  labs(x = "Screen Name", y = "Number of Tweets", title = "Which Members Tweet Bible Verses?", caption = "Scraped from Twitter's API (6/2008 - 4/2018)", subtitle = "The Top 10 Accounts Were All Republicans") +
+  ggsave(file="D://rtweets/congress/bible_verse_count_n.png", dpi = 300, width = 10, height =6, type = "cairo")
 
-ggsave(file="D://rtweets/congress/bible_verse_count.png", type = "cairo-png", width = 21, height = 15)
-
+clean <- merged %>% 
+  select(screen_name, party, gender) %>% 
+  left_join(clean)
 
 
